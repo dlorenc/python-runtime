@@ -1,7 +1,4 @@
-# The Google App Engine base image is debian (jessie) with ca-certificates
-# installed.
-# Source: https://github.com/GoogleCloudPlatform/debian-docker
-FROM ${OS_BASE_IMAGE}
+FROM gcr.io/gcp-runtimes/ubuntu_16_0_4:latest
 
 ADD resources /resources
 ADD scripts /scripts
@@ -40,13 +37,4 @@ RUN /usr/bin/pip install --upgrade -r /resources/requirements.txt && \
     rm -f /opt/python3.6/bin/pip /opt/python3.6/bin/pip3 && \
     /usr/bin/pip install --upgrade -r /resources/requirements-virtualenv.txt
 
-# Setup the app working directory
-RUN ln -s /home/vmagent/app /app
-WORKDIR /app
 
-# Port 8080 is the port used by Google App Engine for serving HTTP traffic.
-EXPOSE 8080
-ENV PORT 8080
-
-# The user's Dockerfile must specify an entrypoint with ENTRYPOINT or CMD.
-CMD []

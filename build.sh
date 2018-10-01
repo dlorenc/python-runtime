@@ -24,7 +24,6 @@ test=0 # Should run standard test suite?
 
 local=0 # Should run using local Docker daemon instead of GCR?
 
-os_base=debian8 # Which operating system base to use
 interpreter=0 # Should build interpreters instead of images
 
 # Note that $gcloud_cmd has spaces in it
@@ -48,7 +47,6 @@ Options:
   --[no]test: Run basic tests (default true if no options set)
   --[no]client_test: Run Google Cloud Client Library tests (default false)
   --[no]local: Build images using local Docker daemon (default false)
-  --os_base: Which OS image to build on top of [debian8, ubuntu16]
 "
 }
 
@@ -111,14 +109,6 @@ while [ $# -gt 0 ]; do
       local=0
       shift
       ;;
-    --os_base=debian8)
-      os_base=debian8
-      shift
-      ;;
-    --os_base=ubuntu16)
-      os_base=ubuntu16
-      shift
-      ;;
     --test)
       test=1
       shift
@@ -153,12 +143,6 @@ if [ "${local}" -eq 1 ]; then
   gcloud_cmd="${local_gcloud_cmd}"
 fi
 
-# Pick OS image to use as base
-if [ "${os_base}" == "ubuntu16" ]; then
-  export OS_BASE_IMAGE="gcr.io/gcp-runtimes/ubuntu_16_0_4:latest"
-else
-  export OS_BASE_IMAGE="gcr.io/google-appengine/debian8:latest"
-fi
 export STAGING_IMAGE="${DOCKER_NAMESPACE}/python:${TAG}"
 echo "Using base image name ${STAGING_IMAGE}"
 
@@ -173,7 +157,7 @@ for outfile in \
   tests/integration/Dockerfile \
   ; do
   envsubst <"${outfile}".in >"${outfile}" \
-    '$OS_BASE_IMAGE $STAGING_IMAGE $GOOGLE_CLOUD_PROJECT_FOR_TESTS $TAG'
+    '$STAGING_IMAGE $GOOGLE_CLOUD_PROJECT_FOR_TESTS $TAG'
 done
 
 # Make some files available to the runtime builder Docker context
